@@ -1,7 +1,5 @@
 import express from "express";
-
-const HOSTNAME = "127.0.0.1";
-const PORT = 3000;
+import { serverConfig } from "./config.js";
 
 const app = express();
 
@@ -9,6 +7,10 @@ app.get("/", (req, res) => {
   res.send("Welcome to SubHub API");
 });
 
-app.listen(PORT, HOSTNAME, () => {
-  console.log(`Server running on http://${HOSTNAME}:${PORT}`);
+app.listen(serverConfig.PORT, serverConfig.HOSTNAME, () => {
+  console.log(
+    `Server running on http://${serverConfig.HOSTNAME}:${serverConfig.PORT}`,
+  );
 });
+
+export default app;
