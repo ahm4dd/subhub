@@ -11,7 +11,7 @@ export async function createUser(user: NewUser) {
     throw new Error("Invalid email format.");
   }
 
-  const insertedUser = await db.insert(users).values(user).returning();
+  const [insertedUser] = await db.insert(users).values(user).returning();
   return insertedUser;
 }
 
