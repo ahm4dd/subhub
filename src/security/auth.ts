@@ -16,5 +16,5 @@ export function makeJWT(
     iat: Math.floor(Date.now() / 1000),
     exp: Math.floor(Date.now() / 1000) + expiresIn,
   };
-  return jwt.sign(payload, ecret);
+  return jwt.sign(payload, secret);
 }
