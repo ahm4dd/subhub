@@ -2,14 +2,14 @@ import { db } from "../index.ts"; // Your configured Drizzle instance
 import { subscriptions, NewSubscription } from "../schema.ts";
 
 export async function createSubscription(
-  data: Omit<NewSubscription, "renewalDate" | "status"> & {
+  subscription: Omit<NewSubscription, "renewalDate" | "status"> & {
     renewalDate?: Date;
   },
 ) {
   const subscriptionToSave: NewSubscription = {
-    ...data,
+    ...subscription,
     status: "active",
-    renewalDate: data.renewalDate || null,
+    renewalDate: subscription.renewalDate || null,
   };
 
   if (!subscriptionToSave.renewalDate) {
