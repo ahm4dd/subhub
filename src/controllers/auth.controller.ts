@@ -27,7 +27,8 @@ export async function signUp(req: Request, res: Response, next: NextFunction) {
         throw new AuthenticationError("User already exists.");
       }
 
-      const user: Omit<User, "hashedPassword"> = await createUser(params);
+      const user: User = await createUser(params);
+      const userWithNoPassword = { ...user, passwordHash: undefined };
       if (!user) {
         throw new DatabaseError("Could not create user.");
       }
@@ -46,7 +47,7 @@ export async function signUp(req: Request, res: Response, next: NextFunction) {
         httpOnly: true,
         sameSite: "strict",
       });
-      res.status(201).json({ ...user, token });
+      res.status(201).json({ ...userWithNoPassword, token });
     } else {
       throw new BadRequestError("Invalid or missing user data.");
     }
