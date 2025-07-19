@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { JwtPayload } from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import { AuthorizationError } from "../errors.ts";
 
 const SALT_ROUNDS = 10;
 
@@ -17,6 +18,15 @@ export function makeJWT(
     exp: Math.floor(Date.now() / 1000) + expiresIn,
   };
   return jwt.sign(payload, secret);
+}
+
+export function verifyJWT(token: string, secret: string): string {
+  try {
+    const decoded = jwt.verify(token, secret);
+    return decoded.sub as string;
+  } catch (err) {
+    throw new AuthorizationError("Invalid access token!");
+  }
 }
 
 export async function hashPassword(
