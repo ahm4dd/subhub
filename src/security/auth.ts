@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import { JwtPayload } from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { AuthorizationError } from "../errors.ts";
+import crypto from "node:crypto";
 
 const SALT_ROUNDS = 10;
 
@@ -41,4 +42,8 @@ export async function checkPassword(
   hashedPassword: string,
 ): Promise<boolean> {
   return await bcrypt.compare(password, hashedPassword);
+}
+
+export function generateRefreshToken() {
+  return crypto.randomBytes(32).toString("hex");
 }
