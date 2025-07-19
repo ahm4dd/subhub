@@ -15,7 +15,6 @@ export const users = pgTable(
     name: varchar("name", { length: 255 }).notNull(),
     email: varchar("email").unique().notNull(),
     passwordHash: varchar("password_hash").notNull(),
-    salt: varchar("salt").notNull(),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at")
       .notNull()
