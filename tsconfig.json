@@ -17,8 +17,10 @@
     "rootDir": "src",
     "allowSyntheticDefaultImports": true,
     "declaration": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "allowImportingTsExtensions": true,
+    "emitDeclarationOnly": true
   },
-  "include": ["src"],
+  "include": ["src", "src/config.ts", "app.ts", "drizzle.config.ts"],
   "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }

@@ -1,8 +1,8 @@
 import express from "express";
 import { serverConfig } from "./config.js";
-import userRouter from "./routes/user.routes.js";
-import authRouter from "./routes/auth.routes.js";
-import subscriptionRouter from "./routes/subscription.routes.js";
+import userRouter from "./routes/user.routes.ts";
+import authRouter from "./routes/auth.routes.ts";
+import subscriptionRouter from "./routes/subscription.routes.ts";
 
 const app = express();
 
