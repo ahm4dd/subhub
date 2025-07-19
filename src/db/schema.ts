@@ -12,7 +12,7 @@ export const users = pgTable(
   "users",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    name: varchar("name", { length: 255 }).notNull(),
+    name: varchar("name", { length: 256 }).notNull(),
     email: varchar("email").unique().notNull(),
     passwordHash: varchar("password_hash").notNull(),
     createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -30,7 +30,7 @@ export const subscriptions = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     name: varchar("name", { length: 100 }).notNull(),
     userId: uuid("user_id")
-      .references(() => users.id)
+      .references(() => users.id, { onDelete: "cascade" })
       .notNull(),
     price: integer("price").notNull(),
     currency: varchar("currency").default("USD"),
@@ -67,8 +67,24 @@ export const subscriptions = pgTable(
   ],
 );
 
+export const refreshTokens = pgTable("refresh_tokens", {
+  token: varchar("token", { length: 256 }).primaryKey().notNull(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at")
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+  expiresAt: timestamp("expires_at").notNull(),
+  revokedAt: timestamp("revoked_at"),
+});
+
 export type NewSubscription = typeof subscriptions.$inferInsert;
 export type NewUser = typeof users.$inferInsert;
+export type NewRefreshToken = typeof refreshTokens.$inferInsert;
 
 export type User = typeof users.$inferSelect;
 export type Subscription = typeof subscriptions.$inferSelect;
+export type RefreshToken = typeof refreshTokens.$inferSelect;
