@@ -6,6 +6,7 @@ import {
   AuthenticationError,
   AuthorizationError,
   ServerError,
+  ConflictError,
 } from "../errors.ts";
 import { createUser, getUserByEmail } from "../db/queries/users.ts";
 import { serverConfig } from "../config.ts";
@@ -24,7 +25,7 @@ export async function signUp(req: Request, res: Response, next: NextFunction) {
       params.passwordHash = await hashPassword(params.passwordHash);
       const doesUserExist = await getUserByEmail(params.email);
       if (doesUserExist) {
-        throw new AuthenticationError("User already exists.");
+        throw new ConflictError("User already exists.");
       }
 
       const user: User = await createUser(params);
