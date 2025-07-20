@@ -7,6 +7,7 @@ import {
   AuthenticationError,
   AuthorizationError,
   ServerError,
+  ConflictError,
 } from "../errors.ts";
 
 export function middlewareError(
@@ -29,6 +30,8 @@ export function middlewareError(
     statusCode = 401;
   } else if (err instanceof AuthorizationError) {
     statusCode = 403;
+  } else if (err instanceof ConflictError) {
+    statusCode = 409;
   } else if (err instanceof ServerError) {
     statusCode = 500;
   }
