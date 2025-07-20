@@ -14,6 +14,7 @@ import {
   makeJWT,
   generateRefreshToken,
   hashPassword,
+  checkPassword,
 } from "../security/auth.ts";
 import { createRefreshToken } from "../db/queries/refreshTokens.ts";
 
@@ -53,6 +54,42 @@ export async function signUp(req: Request, res: Response, next: NextFunction) {
       res.status(201).json({ ...userWithNoPassword, token });
     } else {
       throw new BadRequestError("Invalid or missing user data.");
+    }
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function signIn(req: Request, res: Response, next: NextFunction) {
+  try {
+    if (req.body.email && req.body.password) {
+      const params: { email: string; password: string } = req.body;
+      const user = await getUserByEmail(params.email);
+
+      if (!user) {
+        throw new AuthenticationError("User not found.");
+      }
+
+      if (await checkPassword(params.password, user.passwordHash)) {
+        const token = makeJWT(user.id, serverConfig.JWT_SECRET);
+        const refreshToken = createRefreshToken({
+          token: await generateRefreshToken(),
+          userId: user.id,
+          expiresAt: new Date(Date.now() + 5184000),
+        } satisfies NewRefreshToken);
+
+        if (!token || !refreshToken) {
+          throw new ServerError("Could not create auth tokens.");
+        }
+
+        res.cookie("refreshToken", refreshToken, {
+          httpOnly: true,
+          sameSite: "strict",
+        });
+        res.status(200).json({ token });
+      } else {
+        throw new AuthenticationError("Invalid password.");
+      }
     }
   } catch (err) {
     next(err);
