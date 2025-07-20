@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import { Request } from "express";
 import { JwtPayload } from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { AuthorizationError } from "../errors.ts";
@@ -49,5 +50,5 @@ export function generateRefreshToken() {
 }
 
 export function extractBearerToken(req: Request): string | undefined {
-  return req.headers.get("Authorization")?.split(" ")[1] || undefined;
+  return req.headers.authorization?.split(" ")[1] || undefined;
 }
