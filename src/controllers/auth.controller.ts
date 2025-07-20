@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { NewRefreshToken, User } from "../db/schema.ts";
+import { NewRefreshToken, User, NewUser } from "../db/schema.ts";
 import {
   BadRequestError,
   DatabaseError,
@@ -19,16 +19,18 @@ import { createRefreshToken } from "../db/queries/refreshTokens.ts";
 
 export async function signUp(req: Request, res: Response, next: NextFunction) {
   try {
-    type Parameters = Omit<User, "id" | "createdAt" | "updatedAt">;
-    if (req.body satisfies Parameters) {
-      const params: Parameters = req.body;
-      params.passwordHash = await hashPassword(params.passwordHash);
+    if (req.body.name && req.body.email && req.body.password) {
+      const params: Omit<NewUser, "passwordHash"> & { password: string } =
+        req.body;
       const doesUserExist = await getUserByEmail(params.email);
       if (doesUserExist) {
         throw new ConflictError("User already exists.");
       }
 
-      const user: User = await createUser(params);
+      const user: User | undefined = await createUser({
+        passwordHash: await hashPassword(params.password),
+        ...params,
+      } satisfies NewUser);
       const userWithNoPassword = { ...user, passwordHash: undefined };
       if (!user) {
         throw new DatabaseError("Could not create user.");
