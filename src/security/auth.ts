@@ -47,3 +47,7 @@ export async function checkPassword(
 export function generateRefreshToken() {
   return crypto.randomBytes(32).toString("hex");
 }
+
+export function extractBearerToken(req: Request): string | undefined {
+  return req.headers.get("Authorization")?.split(" ")[1] || undefined;
+}
