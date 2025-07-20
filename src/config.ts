@@ -6,6 +6,8 @@ type ServerConfig = {
   PORT: number;
   DB_URL: string;
   JWT_SECRET: string;
+  ARCJET_KEY: string;
+  ARCJET_ENV: string;
 };
 
 export const serverConfig: ServerConfig = {
@@ -13,4 +15,6 @@ export const serverConfig: ServerConfig = {
   PORT: (process.env.PORT as unknown as number) || 3000,
   DB_URL: process.env.DB_URL || "",
   JWT_SECRET: process.env.JWT_SECRET || "",
+  ARCJET_KEY: process.env.ARCJET_KEY || "",
+  ARCJET_ENV: process.env.ARCJET_ENV || "",
 };

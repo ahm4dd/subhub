@@ -73,7 +73,7 @@ export async function signIn(req: Request, res: Response, next: NextFunction) {
       if (await checkPassword(params.password, user.passwordHash)) {
         const token = makeJWT(user.id, serverConfig.JWT_SECRET);
         const refreshToken = createRefreshToken({
-          token: await generateRefreshToken(),
+          token: generateRefreshToken(),
           userId: user.id,
           expiresAt: new Date(Date.now() + 5184000),
         } satisfies NewRefreshToken);
