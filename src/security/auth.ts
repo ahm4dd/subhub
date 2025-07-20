@@ -50,5 +50,5 @@ export function generateRefreshToken() {
 }
 
 export function extractBearerToken(req: Request): string | undefined {
-  return req.headers.authorization?.split(" ")[1] || undefined;
+  return req.headers.authorization?.split("Bearer ")[1] || undefined;
 }
