@@ -8,6 +8,8 @@ import {
   AuthorizationError,
   ServerError,
   ConflictError,
+  RateLimitError,
+  BotError,
 } from "../errors.ts";
 
 export function middlewareError(
