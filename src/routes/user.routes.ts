@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { getUserDetails } from "../controllers/user.controller.ts";
 
 const userRouter = Router();
 
@@ -6,9 +7,7 @@ userRouter.get("/", (req, res) => {
   res.send({ title: "GET all users" });
 });
 
-userRouter.get("/:id", (req, res) => {
-  res.send({ title: "GET user details" });
-});
+userRouter.get("/:id", getUserDetails);
 userRouter.post("/", (req, res) => {
   res.send({ title: "CREATE new user" });
 });
