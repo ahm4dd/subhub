@@ -14,7 +14,6 @@ export async function createSubscriptionHandler(
     try {
         if (req.body.name && req.body.price && req.body.category && req.body.startDate && req.body.paymentMethod) {
 
-            
             const authenticated = authenticateToken(req, serverConfig.JWT_SECRET);
             if (authenticated === false) {
                 throw new AuthorizationError("Not authorized to create subscription!");

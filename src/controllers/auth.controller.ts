@@ -7,6 +7,8 @@ import {
   AuthorizationError,
   ServerError,
   ConflictError,
+  NotFoundError,
+  ValidationError,
 } from "../errors.ts";
 import { createUser, getUserByEmail } from "../db/queries/users.ts";
 import { serverConfig } from "../config.ts";
@@ -16,7 +18,7 @@ import {
   hashPassword,
   checkPassword,
 } from "../security/auth.ts";
-import { createRefreshToken } from "../db/queries/refreshTokens.ts";
+import { createRefreshToken, getRefreshTokenByToken, revokeRefreshToken } from "../db/queries/refreshTokens.ts";
 
 export async function signUp(req: Request, res: Response, next: NextFunction) {
   try {
@@ -95,6 +97,35 @@ export async function signIn(req: Request, res: Response, next: NextFunction) {
       throw new BadRequestError("Invalid or missing user data.");
     }
   } catch (err) {
+    next(err);
+  }
+}
+
+export async function signOut(req: Request, res: Response, next: NextFunction) {
+  try {
+    if (!req.cookies?.refreshToken) {
+      throw new BadRequestError("No refresh token provided!");
+    }
+    
+    const refreshToken: string = req.cookies.refreshToken;
+    const token = await getRefreshTokenByToken(refreshToken);
+    if (!token) {
+      throw new NotFoundError("Refresh token not found!");
+    }
+    
+    if (token.revokedAt !== null) {
+      throw new ValidationError("Refresh token already revoked!");
+    }
+    
+    if (token.expiresAt < new Date()) {
+      throw new ValidationError("Refresh token expired!");
+    }
+    
+    await revokeRefreshToken(refreshToken);
+
+    res.clearCookie("refreshToken");
+    res.status(204).send();
+  } catch(err) {
     next(err);
   }
 }
