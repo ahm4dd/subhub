@@ -4,6 +4,7 @@ import { JwtPayload } from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { AuthorizationError } from "../errors.ts";
 import crypto from "node:crypto";
+import { serverConfig } from "../config.ts";
 
 const SALT_ROUNDS = 10;
 
@@ -51,4 +52,17 @@ export function generateRefreshToken() {
 
 export function extractBearerToken(req: Request): string | undefined {
   return req.headers.authorization?.split("Bearer ")[1] || undefined;
+}
+
+export function authenticateToken(req: Request, secret: string): string | boolean {
+  const token = extractBearerToken(req);
+  if (!token) {
+    return false;
+  }
+  try {
+    const userId = verifyJWT(token, secret);
+    return userId;
+  } catch (err) {
+    return false;
+  }
 }

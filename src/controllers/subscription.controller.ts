@@ -3,7 +3,7 @@ import { createSubscription } from "../db/queries/subscriptions.ts";
 import { Subscription, NewSubscription } from "../db/schema.ts";
 import { AuthorizationError, BadRequestError, NotFoundError, DatabaseError, ServerError} from "../errors.ts";
 import { getUserById } from "../db/queries/users.ts";
-import { extractBearerToken, verifyJWT } from "../security/auth.ts";
+import { authenticateToken, extractBearerToken, verifyJWT } from "../security/auth.ts";
 import { serverConfig } from "../config.ts";
 
 export async function createSubscriptionHandler(
@@ -14,12 +14,14 @@ export async function createSubscriptionHandler(
     try {
         if (req.body.name && req.body.price && req.body.category && req.body.startDate && req.body.userId && req.body.paymentMethod) {
 
-            const token: string | undefined = extractBearerToken(req);
-            if (!token) {
-                throw new BadRequestError("No token provided!");
-            }
-            const userId = verifyJWT(token, serverConfig.JWT_SECRET);
             
+            const authenticated = authenticateToken(req, serverConfig.JWT_SECRET);
+            if (authenticated === false) {
+                throw new AuthorizationError("Not authorized to create subscription!");
+            }
+
+            const userId = authenticated as string;
+
             if (req.body.userId !== userId) {
                 throw new AuthorizationError("Not authorized to create subscription!");
             }

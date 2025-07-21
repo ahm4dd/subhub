@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { getUserById } from "../db/queries/users.ts";
-import { extractBearerToken, verifyJWT } from "../security/auth.ts";
+import { authenticateToken, extractBearerToken, verifyJWT } from "../security/auth.ts";
 import {
   NotFoundError,
   ServerError,
@@ -19,12 +19,14 @@ export async function getUserDetails(
   next: NextFunction,
 ) {
   try {
-    const token = extractBearerToken(req);
-    if (!token) {
-      throw new BadRequestError("No token provided!");
+
+    const authenticated = authenticateToken(req, serverConfig.JWT_SECRET);
+    
+    if (authenticated === false) {
+      throw new AuthorizationError("Not authorized to create subscription!");
     }
 
-    const userId = verifyJWT(token, serverConfig.JWT_SECRET);
+    const userId = authenticated as string;
 
     if (req.params.id !== userId) {
       throw new AuthorizationError("Not authorized to access this resource!");
