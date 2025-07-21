@@ -6,7 +6,7 @@ import authRouter from "./routes/auth.routes.ts";
 import subscriptionRouter from "./routes/subscription.routes.ts";
 import { middlewareError } from "./middlewares/error.middleware.ts";
 import { arcjetMiddleware } from "./middlewares/arcjet.middeware.ts";
-import tokenRouter from "./routes/tokens.routes.ts";
+import tokenRouter from "./routes/token.routes.ts";
 
 const app = express();
 

@@ -91,6 +91,9 @@ export async function signIn(req: Request, res: Response, next: NextFunction) {
         throw new AuthenticationError("Invalid password.");
       }
     }
+    else {
+      throw new BadRequestError("Invalid or missing user data.");
+    }
   } catch (err) {
     next(err);
   }
