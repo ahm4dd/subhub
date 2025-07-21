@@ -47,7 +47,7 @@ export const subscriptions = pgTable(
       .$onUpdate(() => new Date()),
   },
   (table) => [
-    check("currency_check", sql`${table.currency} IN ('USD', 'EUR', 'GDP')`),
+    check("currency_check", sql`${table.currency} IN ('USD', 'EUR', 'GBP')`),
     check("name_length_check", sql`LENGTH(${table.name}) > 2`),
     check("price_check", sql`${table.price} > 0 AND ${table.price} < 100`),
     check(

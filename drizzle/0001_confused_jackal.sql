@@ -1,0 +1,2 @@
+ALTER TABLE "subscriptions" DROP CONSTRAINT "currency_check";--> statement-breakpoint
+ALTER TABLE "subscriptions" ADD CONSTRAINT "currency_check" CHECK ("subscriptions"."currency" IN ('USD', 'EUR', 'GBP'));
