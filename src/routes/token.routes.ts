@@ -1,11 +1,9 @@
 import { Router } from "express";
-import { refresh } from "../controllers/token.controller.ts";
+import { refresh, revoke } from "../controllers/token.controller.ts";
 
 const tokenRouter = Router();
 
 tokenRouter.post("/refresh", refresh);
 
-tokenRouter.post("/revoke", (req, res) => {
-    res.send({ title: "POST revoke token" });
-})
+tokenRouter.post("/revoke", revoke);
 export default tokenRouter;
