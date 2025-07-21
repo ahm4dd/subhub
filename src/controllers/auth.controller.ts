@@ -37,7 +37,7 @@ export async function signUp(req: Request, res: Response, next: NextFunction) {
         throw new DatabaseError("Could not create user.");
       }
       const token = makeJWT(user.id, serverConfig.JWT_SECRET);
-      const refreshToken = createRefreshToken({
+      const refreshToken = await createRefreshToken({
         token: generateRefreshToken(),
         userId: user.id,
         expiresAt: new Date(Date.now() + 5184000),
@@ -47,7 +47,7 @@ export async function signUp(req: Request, res: Response, next: NextFunction) {
         throw new ServerError("Could not create auth tokens.");
       }
 
-      res.cookie("refreshToken", refreshToken, {
+      res.cookie("refreshToken", refreshToken.token, {
         httpOnly: true,
         sameSite: "strict",
       });
@@ -72,7 +72,7 @@ export async function signIn(req: Request, res: Response, next: NextFunction) {
 
       if (await checkPassword(params.password, user.passwordHash)) {
         const token = makeJWT(user.id, serverConfig.JWT_SECRET);
-        const refreshToken = createRefreshToken({
+        const refreshToken = await createRefreshToken({
           token: generateRefreshToken(),
           userId: user.id,
           expiresAt: new Date(Date.now() + 5184000),
@@ -82,7 +82,7 @@ export async function signIn(req: Request, res: Response, next: NextFunction) {
           throw new ServerError("Could not create auth tokens.");
         }
 
-        res.cookie("refreshToken", refreshToken, {
+        res.cookie("refreshToken", refreshToken.token, {
           httpOnly: true,
           sameSite: "strict",
         });
