@@ -6,6 +6,7 @@ import authRouter from "./routes/auth.routes.ts";
 import subscriptionRouter from "./routes/subscription.routes.ts";
 import { middlewareError } from "./middlewares/error.middleware.ts";
 import { arcjetMiddleware } from "./middlewares/arcjet.middeware.ts";
+import tokenRouter from "./routes/tokens.routes.ts";
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use(arcjetMiddleware);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/subscriptions", subscriptionRouter);
+app.use("/api/v1/tokens", tokenRouter);
 
 app.get("/", (req, res) => {
   res.send("Welcome to SubHub API");
