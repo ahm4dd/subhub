@@ -38,7 +38,7 @@ export async function createSubscriptionHandler(
                 throw new ServerError("Could not create subscription!");
             }
             
-            res.status(200).json(newSubscription);
+            res.status(201).json(newSubscription);
         } else {
             throw new BadRequestError("Invalid subscription data!");
         }
