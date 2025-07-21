@@ -46,7 +46,7 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
       throw new ServerError("Could not create access token.");
     }
 
-    res.cookie("refreshToken", refreshToken, {
+    res.cookie("refreshToken", token.token, {
       httpOnly: true,
       sameSite: "strict",
     });
