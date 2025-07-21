@@ -40,7 +40,7 @@ export async function signUp(req: Request, res: Response, next: NextFunction) {
       const refreshToken = await createRefreshToken({
         token: generateRefreshToken(),
         userId: user.id,
-        expiresAt: new Date(Date.now() + 5184000),
+        expiresAt: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000), // 60 days
       } satisfies NewRefreshToken);
 
       if (!token || !refreshToken) {
@@ -75,7 +75,7 @@ export async function signIn(req: Request, res: Response, next: NextFunction) {
         const refreshToken = await createRefreshToken({
           token: generateRefreshToken(),
           userId: user.id,
-          expiresAt: new Date(Date.now() + 5184000),
+          expiresAt: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000), // 60 days
         } satisfies NewRefreshToken);
 
         if (!token || !refreshToken) {

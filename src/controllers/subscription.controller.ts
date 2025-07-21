@@ -12,7 +12,7 @@ export async function createSubscriptionHandler(
     next: NextFunction,
 ) {
     try {
-        if (req.body.name && req.body.price && req.body.category && req.body.startDate && req.body.userId && req.body.paymentMethod) {
+        if (req.body.name && req.body.price && req.body.category && req.body.startDate && req.body.paymentMethod) {
 
             
             const authenticated = authenticateToken(req, serverConfig.JWT_SECRET);
@@ -22,16 +22,12 @@ export async function createSubscriptionHandler(
 
             const userId = authenticated as string;
 
-            if (req.body.userId !== userId) {
-                throw new AuthorizationError("Not authorized to create subscription!");
-            }
-            
             const user = await getUserById(userId);
             if (!user) {
                 throw new NotFoundError("User not found!");
             }
             
-            const subscription: Omit<NewSubscription, "renewalDate" | "status"> & { renewalDate?: Date } = req.body;
+            const subscription: Omit<NewSubscription, "renewalDate" | "status" | "userId"> & { renewalDate?: Date, userId: string } = {...req.body, userId};
             const newSubscription: Subscription = await createSubscription(subscription);
             
             if (!newSubscription) {
