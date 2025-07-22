@@ -1,16 +1,41 @@
-# SubHub API
+# 🌟 SubHub API
 
-A comprehensive subscription management API built with Node.js, Express, TypeScript, and PostgreSQL. SubHub allows users to manage their subscriptions, track renewal dates, and monitor subscription expenses with secure authentication and rate limiting.
+<div align="center">
+
+![SubHub Logo](https://img.shields.io/badge/SubHub-API-blue?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDJMMTMuMDkgOC4yNkwyMCA5TDEzLjA5IDE1Ljc0TDEyIDIyTDEwLjkxIDE1Ljc0TDQgOUwxMC45MSA4LjI2TDEyIDJaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K)
+
+**A subscription management API built with modern technologies**
+
+[![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=flat-square&logo=postgresql&logoColor=white)](https://postgresql.org/)
+[![Express.js](https://img.shields.io/badge/Express.js-000000?style=flat-square&logo=express&logoColor=white)](https://expressjs.com/)
+[![JWT](https://img.shields.io/badge/JWT-000000?style=flat-square&logo=jsonwebtokens&logoColor=white)](https://jwt.io/)
+
+</div>
+
+---
+
+## 📚 Quick Links
+
+- 📖 **[Complete API Documentation](https://ahm4dd.github.io/subhub/)** - Interactive Swagger UI
+- 🚀 **[Getting Started](#installation)** - Setup guide
+- 🔐 **[Authentication](#authentication-endpoints)** - Security details
+- 🏗️ **[Architecture](#tech-stack)** - Technical overview
+
+---
+
+SubHub allows users to manage their subscriptions, track renewal dates, and monitor subscription expenses with secure authentication and comprehensive rate limiting protection.
 
 ## Features
 
-- **User Management**: Secure user registration and authentication
-- **Subscription Tracking**: Create and manage subscription records
-- **JWT Authentication**: Access and refresh token system
-- **Rate Limiting**: Protection against abuse with Arcjet
-- **Bot Detection**: Automated bot protection
-- **Data Validation**: Comprehensive input validation and sanitization
-- **PostgreSQL Integration**: Robust database operations with Drizzle ORM
+- **🔐 User Management**: Secure user registration and authentication
+- **📋 Subscription Tracking**: Create and manage subscription records  
+- **🎫 JWT Authentication**: Access and refresh token system
+- **🛡️ Rate Limiting**: Protection against abuse with Arcjet
+- **🤖 Bot Detection**: Automated bot protection
+- **✅ Data Validation**: Comprehensive input validation and sanitization
+- **🗄️ PostgreSQL Integration**: Robust database operations with Drizzle ORM
 
 ## Tech Stack
 
@@ -22,14 +47,14 @@ A comprehensive subscription management API built with Node.js, Express, TypeScr
 - **Password Hashing**: bcrypt
 - **Development**: tsx, nodemon for hot reloading
 
-## Environment Setup
+## [Environment Setup](#env)
 
 Create environment files for different stages:
 - `.env.development.local`
 - `.env.production.local`
 
 Required environment variables (I have everything in .env.development.local):
-```
+```env
 HOSTNAME=127.0.0.1
 PORT=3000
 DB_URL=postgresql://username:password@localhost:5432/database
@@ -42,7 +67,7 @@ ARCJET_ENV=development
 ## Installation
 
 ```bash
-# MAKE SURE YOU HAVE Postgresql setup with subhub database
+# MAKE SURE YOU HAVE PostgreSQL setup with subhub database
 
 # Clone the repository
 git clone https://github.com/ahm4dd/subhub.git
@@ -61,6 +86,8 @@ npm run dev
 ```
 
 ## API Reference
+
+> **Interactive Documentation**: Visit our [**Swagger UI Documentation**](https://ahm4dd.github.io/subhub/) for a complete, interactive API reference with live testing capabilities.
 
 ### Authentication Endpoints
 
