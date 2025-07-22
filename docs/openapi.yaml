@@ -1,0 +1,843 @@
+openapi: 3.0.3
+info:
+  title: SubHub API
+  description: |
+    A comprehensive subscription management API built with Node.js, Express, TypeScript, and PostgreSQL. 
+    SubHub allows users to manage their subscriptions, track renewal dates, and monitor subscription expenses 
+    with secure authentication and rate limiting.
+  version: 1.0.0
+  contact:
+    name: Ahmed Emad
+    email: contact@subhub.api
+  license:
+    name: MIT License
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://127.0.0.1:3000/api/v1
+    description: Development server
+  - url: https://api.subhub.com/api/v1
+    description: Production server
+
+tags:
+  - name: Authentication
+    description: User authentication endpoints
+  - name: Users
+    description: User management operations
+  - name: Subscriptions
+    description: Subscription management operations
+  - name: Tokens
+    description: Token management operations
+
+security:
+  - BearerAuth: []
+  - AdminAuth: []
+
+paths:
+  /:
+    get:
+      summary: API Welcome Message
+      description: Returns a welcome message for the SubHub API
+      tags:
+        - General
+      responses:
+        "200":
+          description: Welcome message
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "Welcome to SubHub API"
+
+  /auth/sign-up:
+    post:
+      summary: Register a new user
+      description: Create a new user account with name, email, and password
+      tags:
+        - Authentication
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserRegistration"
+      responses:
+        "201":
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: refreshToken=abc123; HttpOnly; SameSite=Strict
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "429":
+          $ref: "#/components/responses/RateLimit"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /auth/sign-in:
+    post:
+      summary: Authenticate user
+      description: Sign in with email and password to receive access token
+      tags:
+        - Authentication
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserLogin"
+      responses:
+        "200":
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: refreshToken=abc123; HttpOnly; SameSite=Strict
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/RateLimit"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /auth/sign-out:
+    post:
+      summary: Sign out user
+      description: Revoke refresh token and sign out user
+      tags:
+        - Authentication
+      security:
+        - RefreshToken: []
+      responses:
+        "204":
+          description: Successfully signed out
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimit"
+
+  /users:
+    get:
+      summary: Get all users (Admin only)
+      description: Retrieve a list of all users in the system
+      tags:
+        - Users
+      security:
+        - AdminAuth: []
+      responses:
+        "200":
+          description: List of users retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "429":
+          $ref: "#/components/responses/RateLimit"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    post:
+      summary: Create user (Admin only)
+      description: Create a new user account as an administrator
+      tags:
+        - Users
+      security:
+        - AdminAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserRegistration"
+      responses:
+        "201":
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "429":
+          $ref: "#/components/responses/RateLimit"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /users/{id}:
+    get:
+      summary: Get user details
+      description: Retrieve details of a specific user (own profile only)
+      tags:
+        - Users
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID (UUID)
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: User details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimit"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    put:
+      summary: Update user
+      description: Update user information (To be implemented)
+      tags:
+        - Users
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID (UUID)
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+                    example: "UPDATE user"
+        "429":
+          $ref: "#/components/responses/RateLimit"
+
+    delete:
+      summary: Delete user
+      description: Delete user account (To be implemented)
+      tags:
+        - Users
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID (UUID)
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: User deletion initiated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+                    example: "DELETE user"
+        "429":
+          $ref: "#/components/responses/RateLimit"
+
+  /subscriptions:
+    get:
+      summary: Get all subscriptions
+      description: Retrieve all subscriptions for the authenticated user (To be implemented)
+      tags:
+        - Subscriptions
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: List of subscriptions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+                    example: "GET all subscriptions"
+        "429":
+          $ref: "#/components/responses/RateLimit"
+
+    post:
+      summary: Create subscription
+      description: Create a new subscription for the authenticated user
+      tags:
+        - Subscriptions
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubscriptionCreate"
+      responses:
+        "201":
+          description: Subscription created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subscription"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimit"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+    put:
+      summary: Update subscription
+      description: Update subscription details (To be implemented)
+      tags:
+        - Subscriptions
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Subscription update initiated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+                    example: "UPDATE subscription"
+        "429":
+          $ref: "#/components/responses/RateLimit"
+
+    delete:
+      summary: Delete subscription
+      description: Delete a subscription (To be implemented)
+      tags:
+        - Subscriptions
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Subscription deletion initiated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+                    example: "DELETE subscription"
+        "429":
+          $ref: "#/components/responses/RateLimit"
+
+  /subscriptions/{id}:
+    get:
+      summary: Get subscription details
+      description: Retrieve details of a specific subscription (To be implemented)
+      tags:
+        - Subscriptions
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Subscription ID (UUID)
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Subscription details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+                    example: "GET subscription details"
+        "429":
+          $ref: "#/components/responses/RateLimit"
+
+  /subscriptions/{id}/cancel:
+    put:
+      summary: Cancel subscription
+      description: Cancel a specific subscription (To be implemented)
+      tags:
+        - Subscriptions
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Subscription ID (UUID)
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Subscription cancellation initiated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+                    example: "CANCEL subscription"
+        "429":
+          $ref: "#/components/responses/RateLimit"
+
+  /subscriptions/user/{id}:
+    get:
+      summary: Get user subscriptions
+      description: Retrieve all subscriptions for a specific user (To be implemented)
+      tags:
+        - Subscriptions
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID (UUID)
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: User subscriptions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+                    example: "GET all user subscriptions"
+        "429":
+          $ref: "#/components/responses/RateLimit"
+
+  /subscriptions/upcoming-renewals:
+    get:
+      summary: Get upcoming renewals
+      description: Retrieve subscriptions with upcoming renewal dates (To be implemented)
+      tags:
+        - Subscriptions
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Upcoming renewals
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+                    example: "GET all upcoming renewals"
+        "429":
+          $ref: "#/components/responses/RateLimit"
+
+  /tokens/refresh:
+    post:
+      summary: Refresh access token
+      description: Get a new access token using refresh token
+      tags:
+        - Tokens
+      security:
+        - RefreshToken: []
+      responses:
+        "200":
+          description: Access token refreshed successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimit"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /tokens/revoke:
+    post:
+      summary: Revoke refresh token
+      description: Revoke the current refresh token
+      tags:
+        - Tokens
+      security:
+        - RefreshToken: []
+      responses:
+        "204":
+          description: Refresh token revoked successfully
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/RateLimit"
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT access token for user authentication
+    AdminAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT access token for admin authentication
+    RefreshToken:
+      type: apiKey
+      in: cookie
+      name: refreshToken
+      description: HTTP-only refresh token cookie
+
+  schemas:
+    UserRegistration:
+      type: object
+      required:
+        - name
+        - email
+        - password
+      properties:
+        name:
+          type: string
+          minLength: 3
+          maxLength: 256
+          description: User's full name
+          example: "John Doe"
+        email:
+          type: string
+          format: email
+          description: User's email address
+          example: "john.doe@example.com"
+        password:
+          type: string
+          minLength: 8
+          description: User's password
+          example: "SecurePassword123!"
+
+    UserLogin:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          description: User's email address
+          example: "john.doe@example.com"
+        password:
+          type: string
+          description: User's password
+          example: "SecurePassword123!"
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique user identifier
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        name:
+          type: string
+          description: User's full name
+          example: "John Doe"
+        email:
+          type: string
+          format: email
+          description: User's email address
+          example: "john.doe@example.com"
+        createdAt:
+          type: string
+          format: date-time
+          description: Account creation timestamp
+          example: "2024-01-15T10:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last update timestamp
+          example: "2024-01-15T10:30:00Z"
+
+    UserResponse:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/User"
+        - type: object
+          properties:
+            token:
+              type: string
+              description: JWT access token
+              example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+    TokenResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: JWT access token
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+    SubscriptionCreate:
+      type: object
+      required:
+        - name
+        - price
+        - category
+        - startDate
+        - paymentMethod
+      properties:
+        name:
+          type: string
+          minLength: 3
+          maxLength: 100
+          description: Subscription service name
+          example: "Netflix Premium"
+        price:
+          type: integer
+          minimum: 1
+          maximum: 99
+          description: Subscription price
+          example: 15
+        category:
+          type: string
+          enum:
+            [
+              sports,
+              news,
+              entertainment,
+              lifestyle,
+              technology,
+              finance,
+              politics,
+              other,
+            ]
+          description: Subscription category
+          example: "entertainment"
+        startDate:
+          type: string
+          format: date-time
+          description: Subscription start date
+          example: "2024-01-15T00:00:00Z"
+        paymentMethod:
+          type: string
+          description: Payment method used
+          example: "Credit Card"
+        frequency:
+          type: string
+          enum: [daily, weekly, monthly, yearly]
+          default: "monthly"
+          description: Billing frequency
+          example: "monthly"
+        currency:
+          type: string
+          enum: [USD, EUR, GBP]
+          default: "USD"
+          description: Currency code
+          example: "USD"
+
+    Subscription:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique subscription identifier
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        name:
+          type: string
+          description: Subscription service name
+          example: "Netflix Premium"
+        userId:
+          type: string
+          format: uuid
+          description: ID of the user who owns this subscription
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        price:
+          type: integer
+          description: Subscription price
+          example: 15
+        currency:
+          type: string
+          enum: [USD, EUR, GBP]
+          description: Currency code
+          example: "USD"
+        frequency:
+          type: string
+          enum: [daily, weekly, monthly, yearly]
+          description: Billing frequency
+          example: "monthly"
+        status:
+          type: string
+          enum: [active, cancelled, expired]
+          description: Subscription status
+          example: "active"
+        category:
+          type: string
+          enum:
+            [
+              sports,
+              news,
+              entertainment,
+              lifestyle,
+              technology,
+              finance,
+              politics,
+              other,
+            ]
+          description: Subscription category
+          example: "entertainment"
+        paymentMethod:
+          type: string
+          description: Payment method used
+          example: "Credit Card"
+        startDate:
+          type: string
+          format: date-time
+          description: Subscription start date
+          example: "2024-01-15T00:00:00Z"
+        renewalDate:
+          type: string
+          format: date-time
+          nullable: true
+          description: Next renewal date
+          example: "2024-02-15T00:00:00Z"
+        createdAt:
+          type: string
+          format: date-time
+          description: Subscription creation timestamp
+          example: "2024-01-15T10:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last update timestamp
+          example: "2024-01-15T10:30:00Z"
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+          example: "Invalid input data"
+
+  responses:
+    BadRequest:
+      description: Bad Request - Invalid input data
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error: "Invalid or missing user data"
+
+    Unauthorized:
+      description: Unauthorized - Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error: "Invalid credentials"
+
+    Forbidden:
+      description: Forbidden - Insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error: "Not authorized to access this resource"
+
+    NotFound:
+      description: Not Found - Resource does not exist
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error: "User not found"
+
+    Conflict:
+      description: Conflict - Resource already exists
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error: "User already exists"
+
+    RateLimit:
+      description: Too Many Requests - Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error: "Rate limit exceeded"
+
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            error: "Internal server error"
