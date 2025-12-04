@@ -36,13 +36,13 @@ SubHub allows users to manage their subscriptions, track renewal dates, and moni
 
 ## Features
 
-- ** User Management**: Secure user registration and authentication
-- ** Subscription Tracking**: Create and manage subscription records  
-- ** JWT Authentication**: Access and refresh token system
-- ** Rate Limiting**: Protection against abuse with Arcjet
-- ** Bot Detection**: Automated bot protection
-- ** Data Validation**: Comprehensive input validation and sanitization
-- ** PostgreSQL Integration**: Robust database operations with Drizzle ORM
+- **User Management**: Secure user registration and authentication
+- **Subscription Tracking**: Create and manage subscription records  
+- **JWT Authentication**: Access and refresh token system
+- **Rate Limiting**: Protection against abuse with Arcjet
+- **Bot Detection**: Automated bot protection
+- **Data Validation**: Comprehensive input validation and sanitization
+- **PostgreSQL Integration**: Robust database operations with Drizzle ORM
 
 ## Tech Stack
 
