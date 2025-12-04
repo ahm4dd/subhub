@@ -1,4 +1,4 @@
-# 🌟 SubHub API
+# SubHub API
 
 
 <div align="center">
@@ -23,12 +23,12 @@
 
 ---
 
-## 📚 Quick Links
+## Quick Links
 
-- 📖 **[Complete API Documentation](https://ahm4dd.github.io/subhub/)** - Interactive Swagger UI
-- 🚀 **[Getting Started](#installation)** - Setup guide
-- 🔐 **[Authentication](#authentication-endpoints)** - Security details
-- 🏗️ **[Architecture](#tech-stack)** - Technical overview
+-  **[Complete API Documentation](https://ahm4dd.github.io/subhub/)** - Interactive Swagger UI
+-  **[Getting Started](#installation)** - Setup guide
+-  **[Authentication](#authentication-endpoints)** - Security details
+-  **[Architecture](#tech-stack)** - Technical overview
 
 ---
 
